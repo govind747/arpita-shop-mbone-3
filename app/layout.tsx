@@ -3,6 +3,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { Web3Provider } from '@/components/providers/Web3Provider'
@@ -42,6 +43,7 @@ export default function RootLayout({
             <div className="min-h-screen bg-brand-background">
               <Header />
               <main>{children}</main>
+              <Footer />
               <Toaster />
             </div>
           </AuthProvider>

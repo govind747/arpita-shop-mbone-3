@@ -2,19 +2,22 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, User, Search, Menu, X } from 'lucide-react'
+import { ShoppingCart, User, Search, Menu, X, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { UserMenu } from '@/components/auth/UserMenu'
 import { useCartStore } from '@/lib/stores/cartStore'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { user } = useAuth()
   const { items } = useCartStore()
+  const { isConnected } = useAccount()
 
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0)
 
@@ -74,7 +77,20 @@ export function Header() {
 
             {/* User Menu */}
             {user ? (
-              <UserMenu />
+              <div className="flex items-center gap-3">
+                {/* Connect Wallet Button for signed-in users */}
+                <div className="hidden sm:block">
+                  <ConnectButton 
+                    chainStatus="icon"
+                    accountStatus={{
+                      smallScreen: 'avatar',
+                      largeScreen: 'full',
+                    }}
+                    showBalance={false}
+                  />
+                </div>
+                <UserMenu />
+              </div>
             ) : (
               <Button 
                 onClick={() => setIsAuthModalOpen(true)}
@@ -125,6 +141,15 @@ export function Header() {
                   <User className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
+              )}
+              {user && (
+                <div className="pt-2">
+                  <ConnectButton 
+                    chainStatus="icon"
+                    accountStatus="avatar"
+                    showBalance={false}
+                  />
+                </div>
               )}
             </nav>
           </div>
