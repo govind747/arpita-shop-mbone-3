@@ -119,7 +119,7 @@ export function SignUpModal({ open, onOpenChange, onSwitchToSignIn }: SignUpModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden bg-white">
         <div className="flex h-[700px]">
           {/* Left Side - Image */}
           <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-brand-accent to-brand-highlight relative">
@@ -132,8 +132,8 @@ export function SignUpModal({ open, onOpenChange, onSwitchToSignIn }: SignUpModa
             />
             <div className="relative z-10 flex flex-col justify-center items-center text-white p-8">
               <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">Join ModernMart!</h2>
-                <p className="text-lg opacity-90">
+                <h2 className="text-3xl font-bold mb-4 text-brand-primary">Join ModernMart!</h2>
+                <p className="text-lg opacity-90 text-brand-secondary">
                   Create your account and start shopping for premium electronics
                 </p>
               </div>
@@ -141,17 +141,8 @@ export function SignUpModal({ open, onOpenChange, onSwitchToSignIn }: SignUpModa
           </div>
 
           {/* Right Side - Form */}
-          <div className="w-full md:w-1/2 p-8 relative overflow-y-auto">
+          <div className="w-full md:w-1/2 p-8 relative overflow-y-auto bg-white">
             {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute top-4 right-4 p-2 z-10"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-
             <div className="flex flex-col justify-center min-h-full max-w-sm mx-auto py-8">
               <div className="text-center mb-6">
                 <h1 className="text-2xl font-bold text-brand-secondary mb-2">Create Account</h1>

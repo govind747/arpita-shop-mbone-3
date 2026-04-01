@@ -3,14 +3,14 @@
 import '@rainbow-me/rainbowkit/styles.css'
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
-import { polygon } from 'wagmi/chains'
+import { polygon, sepolia } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 
 const config = getDefaultConfig({
   appName: 'ModernMart',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-  chains: [polygon],
+  chains: [sepolia],
   ssr: true,
 })
 

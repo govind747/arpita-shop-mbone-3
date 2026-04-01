@@ -116,7 +116,7 @@ export function OrderCard({ order }: OrderCardProps) {
               {order.payment_tx_hash && (
                 <div>
                   <a 
-                    href={`https://polygonscan.com/tx/${order.payment_tx_hash}`}
+                    href={`https://sepolia.etherscan.io/tx/${order.payment_tx_hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs text-brand-accent hover:underline"

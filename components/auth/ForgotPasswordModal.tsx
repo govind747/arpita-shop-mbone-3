@@ -49,7 +49,7 @@ export function ForgotPasswordModal({ open, onOpenChange, onSwitchToSignIn }: Fo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden bg-white">
         <div className="flex h-[500px]">
           {/* Left Side - Image */}
           <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-brand-secondary to-brand-primary relative">
@@ -62,9 +62,9 @@ export function ForgotPasswordModal({ open, onOpenChange, onSwitchToSignIn }: Fo
             />
             <div className="relative z-10 flex flex-col justify-center items-center text-white p-8">
               <div className="text-center">
-                <Mail className="h-16 w-16 mx-auto mb-4 opacity-90" />
-                <h2 className="text-3xl font-bold mb-4">Reset Password</h2>
-                <p className="text-lg opacity-90">
+                <Mail className="h-16 w-16 mx-auto mb-4 opacity-90 text-brand-primary" />
+                <h2 className="text-3xl font-bold mb-4 text-brand-primary">Reset Password</h2>
+                <p className="text-lg opacity-90 text-brand-secondary">
                   We'll send you a link to reset your password
                 </p>
               </div>
@@ -72,17 +72,8 @@ export function ForgotPasswordModal({ open, onOpenChange, onSwitchToSignIn }: Fo
           </div>
 
           {/* Right Side - Form */}
-          <div className="w-full md:w-1/2 p-8 relative">
+          <div className="w-full md:w-1/2 p-8 relative bg-white">
             {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute top-4 right-4 p-2"
-              onClick={handleClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-
             <div className="flex flex-col justify-center h-full max-w-sm mx-auto">
               {!emailSent ? (
                 <>
