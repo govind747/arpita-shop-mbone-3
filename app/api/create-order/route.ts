@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         wallet_address: walletAddress,
         total_usd: totalUSD,
         total_mbone: totalMBONE.toString(),
-        status: 'pending',
+        status: 'created',
         order_hash: orderHash,
         invoice_id: invoiceId
       })
@@ -117,7 +117,12 @@ export async function POST(request: NextRequest) {
       .insert(orderItemsWithOrderId)
 
     if (itemsError) {
-      console.error('Order items creation error:', itemsError)
+      console.error('❌ Order items failed:', itemsError)
+      
+      // rollback order (IMPORTANT)
+      await supabase.from('orders').delete().eq('id', order.id)
+
+      return NextResponse.json({ error: 'Failed to create order items' }, { status: 500 })
     }
 
     // 🔥 CRITICAL: Create order on blockchain

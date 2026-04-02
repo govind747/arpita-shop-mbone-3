@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createPublicClient, http } from 'viem'
+import { sepolia } from 'viem/chains'
+import { PROCESSOR_ABI } from '@/lib/web3/config'
+
+const publicClient = createPublicClient({
+  chain: sepolia,
+  transport: http()
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -69,8 +77,42 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // TODO: Add real blockchain verification here
-    console.log('Verifying transaction on blockchain:', txHash)
+  const publicClient = createPublicClient({
+    chain: sepolia,
+    transport: http(process.env.NEXT_PUBLIC_RPC_URL)
+  })
+
+  // 1. Get transaction receipt
+  const receipt = await publicClient.getTransactionReceipt({
+    hash: txHash as `0x${string}`
+  })
+
+  if (!receipt || receipt.status !== 'success') {
+    return NextResponse.json({ error: 'Transaction failed on-chain' }, { status: 400 })
+  }
+
+  // 2. Verify contract state
+  const onChainOrder = await publicClient.readContract({
+    address: process.env.NEXT_PUBLIC_PAYMENT_PROCESSOR_ADDRESS as `0x${string}`,
+    abi: PROCESSOR_ABI,
+    functionName: 'getOrder',
+    args: [order.order_hash as `0x${string}`]
+  })
+
+  // 3. VALIDATIONS
+  if (!onChainOrder.paid) {
+    return NextResponse.json({ error: 'Order not marked paid on-chain' }, { status: 400 })
+  }
+
+  if (onChainOrder.buyer.toLowerCase() !== order.wallet_address.toLowerCase()) {
+    return NextResponse.json({ error: 'Buyer mismatch' }, { status: 400 })
+  }
+
+  if (onChainOrder.amount.toString() !== order.total_mbone) {
+    return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 })
+  }
+
+  console.log('✅ Blockchain verification passed')
     
     // Update order status - only update columns that exist in your table
     const { error: updateError } = await supabase
@@ -109,8 +151,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (paymentError) {
-      console.error('Payment record error:', paymentError)
-      // Don't return error here, as order is already updated
+      console.error('❌ Payment insert failed FULL:', JSON.stringify(paymentError, null, 2))
     } else {
       console.log('Crypto payment record created')
     }
