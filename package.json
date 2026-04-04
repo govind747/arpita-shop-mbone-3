@@ -87,5 +87,8 @@
   },
   "resolutions": {
     "encoding": "^0.1.13"
+  },
+  "overrides": {
+    "@wagmi/core": "2.15.2"
   }
 }
