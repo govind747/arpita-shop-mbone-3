@@ -8,11 +8,13 @@ import { useCartStore } from '@/lib/stores/cartStore'
 interface AuthContextType {
   user: User | null
   loading: boolean
+  signOut: () => Promise<void>  // Add this line
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  signOut: async () => {},  // Add default implementation
 })
 
 export const useAuth = () => {
@@ -26,7 +28,18 @@ export const useAuth = () => {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const { loadFromDatabase, syncWithDatabase } = useCartStore()
+  const { loadFromDatabase, syncWithDatabase, clearCart } = useCartStore()
+
+  // Add signOut function
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut()
+      setUser(null)
+      clearCart() // Optional: clear cart on sign out
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -52,8 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Load cart from database when user signs in
           await loadFromDatabase(session.user.id)
         } else if (event === 'SIGNED_OUT') {
-          // Clear cart when user signs out (optional)
-          // You might want to keep local cart for guest users
+          // Clear cart when user signs out
+          clearCart()
         }
         
         setLoading(false)
@@ -61,10 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
-  }, [loadFromDatabase])
+  }, [loadFromDatabase, clearCart])
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   )

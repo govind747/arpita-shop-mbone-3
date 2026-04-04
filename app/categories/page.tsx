@@ -1,145 +1,178 @@
 import Link from 'next/link'
-import { Headphones, Watch, Laptop, Smartphone, Camera, Gamepad2, Speaker, Usb } from 'lucide-react'
+import { Headphones, Watch, Laptop, Smartphone, Camera, Gamepad2, Speaker, Usb, ArrowRight, Zap } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 const categories = [
   {
-    name: 'Headphones & Audio',
+    name: 'Audio & Sound',
     icon: Headphones,
-    count: '25+ items',
-    description: 'Premium headphones, earbuds, and audio accessories',
-    color: 'bg-blue-500'
+    count: '25+ Items',
+    description: 'High-fidelity headphones and studio gear.',
+    color: 'from-blue-500 to-cyan-400',
+    accent: 'text-blue-500',
+    glow: 'group-hover:shadow-blue-500/20'
   },
   {
-    name: 'Smartwatches',
+    name: 'Wearables',
     icon: Watch,
-    count: '15+ items',
-    description: 'Fitness trackers and smart wearables',
-    color: 'bg-green-500'
+    count: '15+ Items',
+    description: 'Next-gen smartwatches and fitness trackers.',
+    color: 'from-emerald-500 to-teal-400',
+    accent: 'text-emerald-500',
+    glow: 'group-hover:shadow-emerald-500/20'
   },
   {
-    name: 'Laptops & Computers',
+    name: 'Computing',
     icon: Laptop,
-    count: '30+ items',
-    description: 'Laptops, accessories, and computer peripherals',
-    color: 'bg-purple-500'
+    count: '30+ Items',
+    description: 'Workstations, laptops, and peripherals.',
+    color: 'from-purple-600 to-indigo-400',
+    accent: 'text-purple-500',
+    glow: 'group-hover:shadow-purple-500/20'
   },
   {
-    name: 'Smartphones',
+    name: 'Mobile Tech',
     icon: Smartphone,
-    count: '20+ items',
-    description: 'Latest smartphones and mobile accessories',
-    color: 'bg-red-500'
+    count: '20+ Items',
+    description: 'The latest flagship phones and accessories.',
+    color: 'from-rose-500 to-orange-400',
+    accent: 'text-rose-500',
+    glow: 'group-hover:shadow-rose-500/20'
   },
   {
-    name: 'Cameras',
+    name: 'Visuals',
     icon: Camera,
-    count: '18+ items',
-    description: 'Digital cameras, webcams, and photography gear',
-    color: 'bg-yellow-500'
+    count: '18+ Items',
+    description: 'Pro cameras and streaming equipment.',
+    color: 'from-amber-400 to-yellow-500',
+    accent: 'text-amber-500',
+    glow: 'group-hover:shadow-amber-500/20'
   },
   {
-    name: 'Gaming',
+    name: 'Gaming Pro',
     icon: Gamepad2,
-    count: '35+ items',
-    description: 'Gaming keyboards, mice, and accessories',
-    color: 'bg-indigo-500'
+    count: '35+ Items',
+    description: 'Mechanical keyboards and high-FPS gear.',
+    color: 'from-indigo-600 to-blue-500',
+    accent: 'text-indigo-500',
+    glow: 'group-hover:shadow-indigo-500/20'
   },
   {
-    name: 'Speakers',
+    name: 'Home Audio',
     icon: Speaker,
-    count: '22+ items',
-    description: 'Bluetooth speakers and sound systems',
-    color: 'bg-pink-500'
+    count: '22+ Items',
+    description: 'Smart speakers and home theater systems.',
+    color: 'from-pink-500 to-rose-400',
+    accent: 'text-pink-500',
+    glow: 'group-hover:shadow-pink-500/20'
   },
   {
-    name: 'Accessories',
+    name: 'Essentials',
     icon: Usb,
-    count: '50+ items',
-    description: 'Cables, chargers, and tech accessories',
-    color: 'bg-orange-500'
+    count: '50+ Items',
+    description: 'Cables, chargers, and power solutions.',
+    color: 'from-slate-700 to-slate-900',
+    accent: 'text-slate-600',
+    glow: 'group-hover:shadow-slate-500/20'
   }
 ]
 
 export default function CategoriesPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Header */}
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-brand-secondary mb-6">
-          Shop by Category
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Explore our wide range of electronics and gadgets organized by category. 
-          Find exactly what you're looking for.
-        </p>
+    <div className="min-h-screen bg-slate-50/50 py-24">
+      {/* Background Mesh (Visual Decoration) */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/50 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-accent/20 blur-[120px] rounded-full" />
       </div>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {categories.map((category) => {
-          const IconComponent = category.icon
-          return (
-            <Link key={category.name} href="/products">
-              <Card className="group hover-lift cursor-pointer border-border/50">
-                <CardContent className="p-6 text-center">
-                  <div className={`w-16 h-16 ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-brand-secondary mb-2 group-hover:text-brand-accent transition-colors">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {category.description}
-                  </p>
-                  <div className="text-xs text-brand-accent font-medium">
-                    {category.count}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          )
-        })}
-      </div>
+      <div className="container relative z-10 mx-auto px-4">
+        {/* Header Section */}
+        <div className="text-center mb-24 max-w-3xl mx-auto">
+          <Badge variant="outline" className="mb-6 px-4 py-1.5 border-slate-200 bg-white text-slate-500 rounded-full font-bold uppercase tracking-widest text-[10px]">
+            Departments
+          </Badge>
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tighter">
+            Explore the <span className="text-brand-accent">Collection.</span>
+          </h1>
+          <p className="text-lg text-slate-500 leading-relaxed font-medium">
+            Discover precision-engineered electronics across eight specialized categories. 
+            Curated for enthusiasts, by enthusiasts.
+          </p>
+        </div>
 
-      {/* Featured Categories */}
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold text-brand-secondary mb-8 text-center">
-          Popular Categories
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href="/products">
-            <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white hover-lift cursor-pointer overflow-hidden">
-              <div className="relative z-10">
-                <Headphones className="h-12 w-12 mb-4" />
-                <h3 className="text-xl font-bold mb-2">Audio & Headphones</h3>
-                <p className="text-white/90 text-sm">Premium sound quality</p>
-              </div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            </div>
-          </Link>
+        {/* Categories Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {categories.map((category) => {
+            const IconComponent = category.icon
+            return (
+              <Link key={category.name} href="/products" className="group">
+                <Card className={`relative h-full border-none bg-white rounded-[2.5rem] transition-all duration-500 overflow-hidden shadow-xl shadow-slate-200/50 hover:-translate-y-2 ${category.glow}`}>
+                  <CardContent className="p-10 flex flex-col items-center text-center">
+                    {/* Icon Container with Gradient Background */}
+                    <div className={`relative w-20 h-20 mb-8 rounded-3xl bg-gradient-to-br ${category.color} flex items-center justify-center text-white shadow-lg group-hover:rotate-6 transition-transform duration-500`}>
+                      <IconComponent className="h-10 w-10" />
+                      <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl" />
+                    </div>
 
-          <Link href="/products">
-            <div className="relative bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl p-8 text-white hover-lift cursor-pointer overflow-hidden">
-              <div className="relative z-10">
-                <Watch className="h-12 w-12 mb-4" />
-                <h3 className="text-xl font-bold mb-2">Smart Wearables</h3>
-                <p className="text-white/90 text-sm">Track your fitness goals</p>
-              </div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            </div>
-          </Link>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6">
+                      {category.description}
+                    </p>
 
-          <Link href="/products">
-            <div className="relative bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-8 text-white hover-lift cursor-pointer overflow-hidden">
-              <div className="relative z-10">
-                <Gamepad2 className="h-12 w-12 mb-4" />
-                <h3 className="text-xl font-bold mb-2">Gaming Gear</h3>
-                <p className="text-white/90 text-sm">Level up your game</p>
+                    <div className="mt-auto flex flex-col items-center">
+                       <span className={`text-xs font-black uppercase tracking-widest ${category.accent} mb-4`}>
+                        {category.count}
+                      </span>
+                      <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all">
+                        <ArrowRight className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Featured Banner / Promo */}
+        <div className="mt-32">
+          <div className="relative rounded-[3.5rem] bg-slate-900 p-12 md:p-20 overflow-hidden text-white">
+            {/* Promo Decoration */}
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-accent/20 to-transparent" />
+            <Zap className="absolute top-10 left-10 h-64 w-64 text-white/5 -rotate-12" />
+
+            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <Badge className="bg-brand-accent text-white mb-6">Trending Now</Badge>
+                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                  New Audio Era: <br />
+                  <span className="text-brand-accent">Studio Grade Wireless.</span>
+                </h2>
+                <p className="text-slate-400 text-lg mb-10 max-w-md">
+                  Experience lossless audio with our latest arrivals in the Studio Pro category. 
+                  Now shipping globally.
+                </p>
+                <Link href="/products">
+                  <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-brand-accent hover:text-white transition-all flex items-center gap-2">
+                    Shop Studio Pro <ArrowRight className="h-5 w-5" />
+                  </button>
+                </Link>
               </div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              
+              <div className="hidden lg:grid grid-cols-2 gap-4">
+                 <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center backdrop-blur-sm">
+                   <Headphones className="h-16 w-16 text-white/20" />
+                 </div>
+                 <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center translate-y-8 backdrop-blur-sm">
+                   <Speaker className="h-16 w-16 text-white/20" />
+                 </div>
+              </div>
             </div>
-          </Link>
+          </div>
         </div>
       </div>
     </div>

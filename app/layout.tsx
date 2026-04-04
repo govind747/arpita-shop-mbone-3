@@ -13,21 +13,6 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'ModernMart - Premium Electronics & Gadgets',
   description: 'Discover the latest electronics, gadgets, and tech accessories at unbeatable prices',
-  openGraph: {
-    images: [
-      {
-        url: 'https://bolt.new/static/og_default.png',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    images: [
-      {
-        url: 'https://bolt.new/static/og_default.png',
-      },
-    ],
-  },
 }
 
 export default function RootLayout({

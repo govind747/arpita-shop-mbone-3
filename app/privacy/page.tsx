@@ -1,231 +1,200 @@
-import { Shield, Eye, Lock, Users } from 'lucide-react'
+import { Shield, Eye, Lock, Users, Fingerprint, FileText, Globe, Bell } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 
 export default function PrivacyPage() {
+  const sections = [
+    { id: "collect", title: "Information We Collect" },
+    { id: "use", title: "How We Use It" },
+    { id: "sharing", title: "Data Sharing" },
+    { id: "security", title: "Security Measures" },
+    { id: "rights", title: "Your Rights" }
+  ];
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Header */}
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-brand-secondary mb-6">
-          Privacy Policy
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Your privacy is important to us. This policy explains how we collect, use, 
-          and protect your personal information.
-        </p>
-        <p className="text-sm text-muted-foreground mt-4">
-          Last updated: January 30, 2024
-        </p>
-      </div>
-
-      {/* Privacy Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="h-6 w-6 text-brand-accent" />
+    <div className="min-h-screen bg-slate-50/50 py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header Section */}
+        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-600">
+              <Shield className="h-10 w-10" />
             </div>
-            <h3 className="font-semibold mb-2">Data Protection</h3>
-            <p className="text-sm text-muted-foreground">
-              We use industry-standard encryption to protect your data
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            Privacy & <span className="text-emerald-600">Data Policy</span>
+          </h1>
+          <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            We believe privacy is a fundamental right. We’ve designed our systems 
+            to collect only what is necessary to give you a great experience.
+          </p>
+          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 text-sm font-medium text-slate-500 shadow-sm">
+            <Lock className="h-4 w-4" /> Last updated: April 2, 2026
+          </div>
+        </div>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Eye className="h-6 w-6 text-brand-accent" />
+        {/* Trust Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+          {[
+            { icon: <Fingerprint />, title: "Anonymity", desc: "Minimal data collection for crypto users." },
+            { icon: <Eye />, title: "Transparency", desc: "No hidden trackers or 3rd party ads." },
+            { icon: <Lock />, title: "Encryption", desc: "End-to-end security for all data syncs." },
+            { icon: <Users />, title: "Ownership", desc: "Request your data or delete it in one click." },
+          ].map((item, i) => (
+            <div key={i} className="group p-8 bg-white rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-emerald-600 mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                {item.icon}
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
             </div>
-            <h3 className="font-semibold mb-2">Transparency</h3>
-            <p className="text-sm text-muted-foreground">
-              Clear information about what data we collect and why
-            </p>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="h-6 w-6 text-brand-accent" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          
+          {/* Sticky Navigation */}
+          <aside className="hidden lg:block lg:col-span-3 sticky top-24 h-fit">
+            <nav className="space-y-1">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 ml-4">Contents</p>
+              {sections.map((s) => (
+                <a 
+                  key={s.id}
+                  href={`#${s.id}`} 
+                  className="block px-4 py-3 rounded-xl text-slate-600 hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all font-medium"
+                >
+                  {s.title}
+                </a>
+              ))}
+            </nav>
+          </aside>
+
+          {/* Policy Content */}
+          <div className="lg:col-span-9 space-y-12">
+            
+            {/* Section 1 */}
+            <section id="collect" className="scroll-mt-24">
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2rem] overflow-hidden">
+                <div className="h-2 bg-emerald-500 w-full" />
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-3xl font-bold flex items-center gap-3">
+                    <FileText className="text-emerald-600" /> Information We Collect
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-0 space-y-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="p-6 rounded-2xl bg-slate-50">
+                      <h4 className="font-bold text-slate-900 mb-4">Core Account Data</h4>
+                      <ul className="space-y-3 text-slate-600 text-sm">
+                        <li className="flex items-center gap-2">• Contact Name & Email</li>
+                        <li className="flex items-center gap-2">• Shipping Destinations</li>
+                        <li className="flex items-center gap-2">• Order History</li>
+                      </ul>
+                    </div>
+                    <div className="p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100">
+                      <h4 className="font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                        <Globe className="h-4 w-4" /> Blockchain Data
+                      </h4>
+                      <ul className="space-y-3 text-emerald-800/80 text-sm">
+                        <li className="flex items-center gap-2">• Public Wallet Address</li>
+                        <li className="flex items-center gap-2">• Polygon Transaction Hashes</li>
+                        <li className="flex items-center gap-2">• MBONE Payment Metadata</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Section 2 */}
+            <section id="use" className="scroll-mt-24">
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2rem]">
+                <CardHeader className="p-8">
+                  <CardTitle className="text-3xl font-bold flex items-center gap-3">
+                    <Bell className="text-blue-500" /> How We Use Your Data
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                  <div className="space-y-6">
+                    {[
+                      { t: "Service Delivery", d: "Fulfilling orders, verifying blockchain transactions, and providing support." },
+                      { t: "Communication", d: "Important account updates and transaction receipts via secure email." },
+                      { t: "Platform Growth", d: "Anonymized analytics to improve the shopping experience for everyone." }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div className="h-6 w-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900">{item.t}</p>
+                          <p className="text-slate-500 text-sm">{item.d}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Section 3: Data Security */}
+            <section id="security" className="scroll-mt-24">
+              <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden">
+                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-emerald-500/10 to-transparent" />
+                <div className="relative z-10">
+                  <h3 className="text-3xl font-bold mb-8 flex items-center gap-3">
+                    <Lock className="text-emerald-400" /> Security Infrastructure
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-10">
+                    <div className="space-y-4">
+                      <p className="text-slate-400 leading-relaxed">
+                        We leverage the best of both worlds: industry-standard AES-256 encryption 
+                        for off-chain data and the immutable security of the Polygon network for payments.
+                      </p>
+                      <ul className="grid grid-cols-1 gap-3">
+                        {["SSL/TLS 1.3 Encryption", "Real-time threat monitoring", "Zero-knowledge proofs where possible"].map((li, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm">
+                            <CheckCircle className="h-4 w-4 text-emerald-400" /> {li}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="flex items-center justify-center">
+                       <div className="w-full aspect-video bg-white/5 rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center">
+                          <Shield className="h-12 w-12 text-emerald-400 mb-4 animate-pulse" />
+                          <p className="text-xs font-mono text-emerald-400/60 uppercase tracking-widest">System Status: Active</p>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Final Contact Section */}
+            <div className="text-center py-12">
+               <h4 className="text-xl font-bold text-slate-900 mb-4">Have questions about your data?</h4>
+               <p className="text-slate-500 mb-8">Our dedicated privacy officer is here to help.</p>
+               <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <a href="mailto:privacy@modernmart.com" className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all">
+                    Email Privacy Officer
+                  </a>
+                  <button className="px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all">
+                    Request Data Export
+                  </button>
+               </div>
             </div>
-            <h3 className="font-semibold mb-2">Secure Storage</h3>
-            <p className="text-sm text-muted-foreground">
-              Your information is stored securely and never sold
-            </p>
-          </CardContent>
-        </Card>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 text-brand-accent" />
-            </div>
-            <h3 className="font-semibold mb-2">Your Control</h3>
-            <p className="text-sm text-muted-foreground">
-              You can access, update, or delete your data anytime
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Privacy Policy Content */}
-      <div className="max-w-4xl mx-auto space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Information We Collect</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Personal Information</h3>
-              <p className="text-muted-foreground mb-2">
-                When you create an account or make a purchase, we collect:
-              </p>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Name and contact information</li>
-                <li>• Email address and phone number</li>
-                <li>• Shipping and billing addresses</li>
-                <li>• Payment information (processed securely)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Crypto Wallet Information</h3>
-              <p className="text-muted-foreground mb-2">
-                For MBONE token payments, we collect:
-              </p>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Wallet addresses for transaction processing</li>
-                <li>• Transaction hashes for order verification</li>
-                <li>• Network information (Polygon blockchain)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Usage Information</h3>
-              <p className="text-muted-foreground mb-2">
-                We automatically collect certain information when you use our website:
-              </p>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Browser type and version</li>
-                <li>• IP address and location data</li>
-                <li>• Pages visited and time spent</li>
-                <li>• Device information and screen resolution</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>How We Use Your Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Order Processing</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Process and fulfill your orders</li>
-                <li>• Send order confirmations and updates</li>
-                <li>• Handle returns and customer service</li>
-                <li>• Process crypto payments securely</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Communication</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Send important account notifications</li>
-                <li>• Respond to your inquiries and support requests</li>
-                <li>• Send promotional emails (with your consent)</li>
-                <li>• Provide customer support</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Website Improvement</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Analyze website usage and performance</li>
-                <li>• Improve our products and services</li>
-                <li>• Personalize your shopping experience</li>
-                <li>• Prevent fraud and ensure security</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Information Sharing</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              We do not sell, trade, or rent your personal information to third parties. 
-              We may share your information only in the following circumstances:
-            </p>
-            <ul className="text-muted-foreground space-y-2 ml-4">
-              <li>• <strong>Service Providers:</strong> With trusted partners who help us operate our business (shipping, payment processing)</li>
-              <li>• <strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
-              <li>• <strong>Business Transfers:</strong> In the event of a merger or acquisition</li>
-              <li>• <strong>Consent:</strong> When you explicitly consent to sharing</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Data Security</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              We implement appropriate security measures to protect your personal information:
-            </p>
-            <ul className="text-muted-foreground space-y-2 ml-4">
-              <li>• SSL encryption for all data transmission</li>
-              <li>• Secure servers with regular security updates</li>
-              <li>• Limited access to personal information</li>
-              <li>• Regular security audits and monitoring</li>
-              <li>• Blockchain security for crypto transactions</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Rights</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              You have the following rights regarding your personal information:
-            </p>
-            <ul className="text-muted-foreground space-y-2 ml-4">
-              <li>• <strong>Access:</strong> Request a copy of your personal data</li>
-              <li>• <strong>Correction:</strong> Update or correct inaccurate information</li>
-              <li>• <strong>Deletion:</strong> Request deletion of your personal data</li>
-              <li>• <strong>Portability:</strong> Request your data in a portable format</li>
-              <li>• <strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
-            </ul>
-            <p className="text-muted-foreground mt-4">
-              To exercise these rights, contact us at privacy@modernmart.com
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Us</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              If you have questions about this Privacy Policy or our data practices, please contact us:
-            </p>
-            <div className="space-y-2 text-muted-foreground">
-              <p><strong>Email:</strong> privacy@modernmart.com</p>
-              <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-              <p><strong>Address:</strong> 123 Tech Street, Digital City, DC 12345</p>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
+}
+
+function CheckCircle({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+    </svg>
+  );
 }

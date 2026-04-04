@@ -7,24 +7,28 @@ import { useCartStore } from '@/lib/stores/cartStore'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { Button } from '@/components/ui/button'
-import { ShoppingBag, User } from 'lucide-react'
+import { ShoppingBag, User, ArrowLeft, ShieldCheck, Truck, CreditCard } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 export default function CheckoutPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { items } = useCartStore()
   const { user } = useAuth()
 
+  // 1. Empty Cart State
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-md mx-auto">
-          <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-brand-secondary mb-2">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-6">Add some products to checkout</p>
+      <div className="min-h-[80vh] flex items-center justify-center container mx-auto px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-24 h-24 bg-slate-100 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
+            <ShoppingBag className="h-10 w-10 text-slate-300" />
+          </div>
+          <h1 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Cart is empty</h1>
+          <p className="text-slate-500 font-medium mb-10">You cannot checkout without any items in your haul.</p>
           <Link href="/products">
-            <Button className="bg-brand-accent hover:bg-brand-accent/90">
-              Continue Shopping
+            <Button className="h-14 px-10 bg-slate-900 hover:bg-brand-accent text-white font-black rounded-2xl transition-all shadow-xl shadow-slate-900/10 active:scale-95">
+              Go to Store
             </Button>
           </Link>
         </div>
@@ -32,18 +36,24 @@ export default function CheckoutPage() {
     )
   }
 
+  // 2. Auth Required State
   if (!user) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-md mx-auto">
-          <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-brand-secondary mb-2">Sign in required</h1>
-          <p className="text-muted-foreground mb-6">Please sign in to continue with checkout</p>
+      <div className="min-h-[80vh] flex items-center justify-center container mx-auto px-4">
+        <div className="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm text-center max-w-md w-full relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 blur-3xl rounded-full -mr-16 -mt-16" />
+          <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <User className="h-10 w-10 text-brand-accent" />
+          </div>
+          <h1 className="text-3xl font-black text-slate-900 mb-3">Identification Required</h1>
+          <p className="text-slate-500 font-medium mb-8 leading-relaxed">
+            Please sign in to your ModernMart account to access secure shipping and Web3 payment protocols.
+          </p>
           <Button 
             onClick={() => setIsAuthModalOpen(true)}
-            className="bg-brand-accent hover:bg-brand-accent/90"
+            className="w-full h-14 bg-slate-900 hover:bg-brand-accent text-white font-black rounded-2xl shadow-xl transition-all active:scale-95"
           >
-            Sign In
+            Sign In to Continue
           </Button>
           <AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
         </div>
@@ -52,20 +62,91 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand-secondary mb-2">Checkout</h1>
-        <p className="text-muted-foreground">Complete your order</p>
+    <div className="min-h-screen bg-slate-50/50 pb-24">
+      {/* Checkout Header & Stepper */}
+      <div className="bg-white border-b border-slate-100 pt-12 pb-8 mb-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex items-center gap-6">
+              <Link href="/cart">
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100">
+                  <ArrowLeft className="h-5 w-5 text-slate-600" />
+                </Button>
+              </Link>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-brand-accent font-black uppercase tracking-widest text-xs">
+                  <ShieldCheck className="h-4 w-4" />
+                  Secure Transaction
+                </div>
+                <h1 className="text-4xl font-black text-slate-900 tracking-tight">Finalizing Order</h1>
+              </div>
+            </div>
+
+            {/* Steps Indicator - Updated for Checkout */}
+            <div className="flex items-center gap-4">
+              <Step icon={ShoppingBag} label="Cart" completed />
+              <div className="h-px w-8 bg-brand-accent" />
+              <Step icon={Truck} label="Shipping" active />
+              <div className="h-px w-8 bg-slate-200" />
+              <Step icon={CreditCard} label="Payment" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <CheckoutForm />
-        </div>
-        <div>
-          <CheckoutSummary />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Main Checkout Form Area */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden p-8 sm:p-10">
+              <CheckoutForm />
+            </div>
+          </div>
+
+          {/* Sticky Checkout Summary Area */}
+          <aside className="lg:col-span-5 sticky top-24">
+             <div className="space-y-6">
+                <div className="bg-slate-900 rounded-[2.5rem] p-1 shadow-2xl shadow-slate-900/20">
+                  <div className="bg-white rounded-[2.2rem] overflow-hidden">
+                    <CheckoutSummary />
+                  </div>
+                </div>
+                
+                {/* Trust Footer */}
+                <div className="bg-brand-accent/5 rounded-[2rem] p-6 border border-brand-accent/10 flex items-start gap-4">
+                  <ShieldCheck className="h-6 w-6 text-brand-accent shrink-0" />
+                  <div>
+                    <p className="text-sm font-black text-brand-accent uppercase tracking-widest mb-1">Encrypted Payment</p>
+                    <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                      All transaction data is processed via secure blockchain nodes and encrypted SSL channels.
+                    </p>
+                  </div>
+                </div>
+             </div>
+          </aside>
+          
         </div>
       </div>
+    </div>
+  )
+}
+
+// Step Component
+function Step({ icon: Icon, label, active = false, completed = false }: { icon: any, label: string, active?: boolean, completed?: boolean }) {
+  return (
+    <div className={cn(
+      "flex items-center gap-2 transition-all",
+      active || completed ? "opacity-100" : "opacity-40"
+    )}>
+      <div className={cn(
+        "h-8 w-8 rounded-lg flex items-center justify-center transition-all",
+        active ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20" : 
+        completed ? "bg-brand-accent text-white" : "bg-slate-100 text-slate-400"
+      )}>
+        <Icon className="h-4 w-4" />
+      </div>
+      <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">{label}</span>
     </div>
   )
 }

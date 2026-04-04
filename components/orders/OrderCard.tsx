@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Package, Clock, CircleCheck as CheckCircle, Circle as XCircle, Truck, ExternalLink, Wallet, ChevronDown, ChevronUp } from 'lucide-react'
+import { Package, Clock, CircleCheck as CheckCircle, Circle as XCircle, Truck, ExternalLink, Wallet, ChevronDown, ChevronUp, Hash, ArrowUpRight, Box } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Order, OrderItem, Shipment } from '@/lib/types/database'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface OrderWithItems extends Order {
   order_items: OrderItem[]
@@ -19,239 +20,171 @@ interface OrderCardProps {
 
 export function OrderCard({ order }: OrderCardProps) {
   const [expanded, setExpanded] = useState(false)
-  const shipment = order.shipments?.[0] // Get the first (and likely only) shipment
+  const shipment = order.shipments?.[0]
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-4 w-4" />
-      case 'paid':
-        return <CheckCircle className="h-4 w-4" />
-      case 'shipped':
-        return <Truck className="h-4 w-4" />
-      case 'cancelled':
-        return <XCircle className="h-4 w-4" />
-      default:
-        return <Package className="h-4 w-4" />
-    }
+  const statusConfig = {
+    pending: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10', dot: 'bg-amber-500' },
+    paid: { icon: CheckCircle, color: 'text-blue-500', bg: 'bg-blue-500/10', dot: 'bg-blue-500' },
+    shipped: { icon: Truck, color: 'text-emerald-500', bg: 'bg-emerald-500/10', dot: 'bg-emerald-500' },
+    cancelled: { icon: XCircle, color: 'text-rose-500', bg: 'bg-rose-500/10', dot: 'bg-rose-500' },
+    default: { icon: Package, color: 'text-slate-500', bg: 'bg-slate-500/10', dot: 'bg-slate-500' },
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-500'
-      case 'paid':
-        return 'bg-blue-500'
-      case 'shipped':
-        return 'bg-green-500'
-      case 'cancelled':
-        return 'bg-red-500'
-      default:
-        return 'bg-gray-500'
-    }
-  }
-
-  const getShipmentStatusColor = (status: string) => {
-    switch (status) {
-      case 'processing':
-        return 'bg-yellow-500'
-      case 'shipped':
-        return 'bg-blue-500'
-      case 'in_transit':
-        return 'bg-purple-500'
-      case 'delivered':
-        return 'bg-green-500'
-      default:
-        return 'bg-gray-500'
-    }
-  }
-
-  // Format MBONE amount (convert from wei/string to readable number)
-  const formatMBONE = (mboneAmount: string | number) => {
-    if (!mboneAmount) return '0'
-    // If it's a string and looks like it's in wei (very large number)
-    const amount = typeof mboneAmount === 'string' ? parseFloat(mboneAmount) : mboneAmount
-    // Check if it's likely in wei (has more than 18 digits)
-    if (amount > 1e18) {
-      return (amount / 1e18).toFixed(2)
-    }
-    return amount.toFixed(2)
-  }
+  const status = (statusConfig[order.status as keyof typeof statusConfig] || statusConfig.default)
+  const StatusIcon = status.icon
 
   return (
-    <Card className="border-border/50 hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {order.invoice_id || `Order #${order.id.slice(-8)}`}
-            </CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">
-              Placed on {new Date(order.created_at).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Badge className={`${getStatusColor(order.status)} text-white`}>
-              <div className="flex items-center gap-1">
-                {getStatusIcon(order.status)}
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+    <Card className="group border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-[2rem] overflow-hidden bg-white">
+      <CardContent className="p-0">
+        {/* Header Summary */}
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-400">Order ID</span>
+                <span className="text-sm font-bold text-slate-900 font-mono">
+                  {order.invoice_id?.slice(0, 12) || `#${order.id.slice(-8).toUpperCase()}`}
+                </span>
               </div>
-            </Badge>
-            {order.wallet_address && (
-              <Badge className="bg-brand-accent text-white">
-                <Wallet className="h-3 w-3 mr-1" />
-                MBONE
-              </Badge>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setExpanded(!expanded)}
-              className="h-8 w-8 p-0"
-            >
-              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
+              <p className="text-xs font-medium text-slate-400">
+                Processed on {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'long' })}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className={cn("flex items-center gap-2 px-4 py-1.5 rounded-full border border-transparent transition-colors", status.bg, status.color)}>
+                <div className={cn("h-2 w-2 rounded-full animate-pulse", status.dot)} />
+                <span className="text-xs font-black uppercase tracking-widest">{order.status}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setExpanded(!expanded)}
+                className={cn("rounded-full bg-slate-50 transition-transform duration-300", expanded && "rotate-180")}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="space-y-4">
-          {/* Order Summary */}
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm text-muted-foreground">
-                {order.order_items.length} {order.order_items.length === 1 ? 'item' : 'items'}
-              </p>
-              <p className="font-semibold text-brand-secondary">
-                Total: ${order.total_usd.toFixed(2)}
-              </p>
-              {order.wallet_address && order.total_mbone && (
-                <p className="text-xs text-brand-accent">
-                  {formatMBONE(order.total_mbone)} MBONE
-                </p>
+
+          <Separator className="my-6 bg-slate-50" />
+
+          {/* Quick Stats Row */}
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="flex gap-8">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Items</p>
+                <p className="text-lg font-bold text-slate-900 leading-none">{order.order_items.length}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">USD Value</p>
+                <p className="text-lg font-bold text-slate-900 leading-none">${order.total_usd.toFixed(2)}</p>
+              </div>
+              {order.total_mbone && (
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-brand-accent">Crypto Total</p>
+                  <p className="text-lg font-bold text-brand-accent leading-none">
+                    {(Number(order.total_mbone) / 1e18 > 1 ? Number(order.total_mbone) / 1e18 : Number(order.total_mbone)).toFixed(2)} MBONE
+                  </p>
+                </div>
               )}
             </div>
-            <div className="text-right space-y-2">
-              {shipment?.status === 'shipped' && shipment.tracking_number && (
-                <Button variant="outline" size="sm">
-                  Track Package
+
+            <div className="flex gap-2">
+              {shipment?.tracking_number && (
+                <Button size="sm" className="bg-slate-900 text-white rounded-xl font-bold h-9 px-5 hover:bg-brand-accent">
+                  Track Parcel
                 </Button>
               )}
               {order.payment_tx_hash && (
-                <div>
-                  <a 
-                    href={`https://sepolia.etherscan.io/tx/${order.payment_tx_hash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-brand-accent hover:underline"
-                  >
-                    View Transaction <ExternalLink className="h-3 w-3" />
-                  </a>
+                <a 
+                  href={`https://sepolia.etherscan.io/tx/${order.payment_tx_hash}`}
+                  target="_blank"
+                  className="flex items-center justify-center h-9 w-9 bg-brand-accent/5 text-brand-accent rounded-xl hover:bg-brand-accent hover:text-white transition-all"
+                >
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Expanded Content */}
+        {expanded && (
+          <div className="px-6 pb-8 sm:px-8 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
+            {/* Products Table */}
+            <div className="bg-slate-50/50 rounded-2xl p-4 sm:p-6 border border-slate-100">
+              <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                <Box className="h-3 w-3" /> Manifest
+              </h4>
+              <div className="space-y-4">
+                {order.order_items.map((item) => (
+                  <div key={item.id} className="flex justify-between items-center group/item">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-900">Product SKU: {item.product_id.slice(0, 12)}...</span>
+                      <span className="text-xs font-medium text-slate-400">Quantity: {item.quantity}</span>
+                    </div>
+                    <span className="text-sm font-black text-slate-700">${item.price_usd.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Shipment Module */}
+              {shipment && (
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                    <Truck className="h-3 w-3" /> Shipping Logistics
+                  </h4>
+                  <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-3 shadow-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Status</span>
+                      <Badge variant="outline" className="rounded-lg border-slate-200 font-bold text-[10px]">{shipment.status.toUpperCase()}</Badge>
+                    </div>
+                    {shipment.tracking_number && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Waybill</span>
+                        <span className="text-xs font-mono font-bold text-slate-700">{shipment.tracking_number}</span>
+                      </div>
+                    )}
+                    {shipment.estimated_delivery && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Est. Arrival</span>
+                        <span className="text-xs font-bold text-slate-700">{new Date(shipment.estimated_delivery).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment/Web3 Module */}
+              {order.wallet_address && (
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-brand-accent flex items-center gap-2">
+                    <Hash className="h-3 w-3" /> Blockchain Ledger
+                  </h4>
+                  <div className="bg-brand-accent/5 border border-brand-accent/10 rounded-2xl p-5 space-y-4 shadow-sm">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-brand-accent/60 uppercase tracking-widest">Signer Wallet</span>
+                      <p className="text-[10px] font-mono font-bold text-brand-accent break-all leading-relaxed">
+                        {order.wallet_address}
+                      </p>
+                    </div>
+                    {order.order_hash && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-black text-brand-accent/60 uppercase tracking-widest">Order Hash</span>
+                        <p className="text-[10px] font-mono font-bold text-slate-600 break-all leading-relaxed">
+                          {order.order_hash}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           </div>
-          
-          {/* Expanded Details */}
-          {expanded && (
-            <div className="space-y-4">
-              <Separator />
-              
-              {/* Order Items */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Order Items</h4>
-                <div className="space-y-2">
-                  {order.order_items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">
-                        Product ID: {item.product_id.slice(0, 8)}... x {item.quantity}
-                      </span>
-                      <span>${item.price_usd.toFixed(2)} USD</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Shipment Information */}
-              {shipment && (
-                <div>
-                  <h4 className="text-sm font-semibold mb-2">Shipment Details</h4>
-                  <div className="bg-muted/30 p-3 rounded-lg space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Status:</span>
-                      <Badge className={`${getShipmentStatusColor(shipment.status)} text-white text-xs`}>
-                        {shipment.status.replace('_', ' ').toUpperCase()}
-                      </Badge>
-                    </div>
-                    
-                    {shipment.courier_name && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Courier:</span>
-                        <span>{shipment.courier_name}</span>
-                      </div>
-                    )}
-                    
-                    {shipment.tracking_number && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tracking:</span>
-                        <span className="font-mono text-xs">{shipment.tracking_number}</span>
-                      </div>
-                    )}
-                    
-                    {shipment.shipped_at && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Shipped:</span>
-                        <span>{new Date(shipment.shipped_at).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                    
-                    {shipment.estimated_delivery && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Est. Delivery:</span>
-                        <span>{new Date(shipment.estimated_delivery).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                    
-                    {shipment.delivered_at && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Delivered:</span>
-                        <span>{new Date(shipment.delivered_at).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Wallet Information */}
-              {order.wallet_address && (
-                <div>
-                  <h4 className="text-sm font-semibold mb-2">Payment Information</h4>
-                  <div className="bg-brand-accent/10 p-3 rounded-lg space-y-2">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Wallet Address:</p>
-                      <p className="text-xs font-mono text-brand-accent break-all">
-                        {order.wallet_address}
-                      </p>
-                    </div>
-                    {order.invoice_id && (
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Invoice ID:</p>
-                        <p className="text-xs font-mono">{order.invoice_id}</p>
-                      </div>
-                    )}
-                    {order.order_hash && (
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Order Hash:</p>
-                        <p className="text-xs font-mono break-all">{order.order_hash}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
     </Card>
   )

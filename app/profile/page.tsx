@@ -1,159 +1,168 @@
 'use client'
 
+import { useState } from 'react' // Added useState
 import { useAuth } from '@/components/providers/AuthProvider'
 import { ProfileForm } from '@/components/profile/ProfileForm'
+import { ProfileOrders } from '@/components/profile/ProfileOrders' // Ensure this is imported
+import { ProfileWishlist } from '@/components/profile/ProfileWishlist' // Ensure this is imported
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { User, Shield, ShoppingBag, Heart } from 'lucide-react'
-import Link from 'next/link'
+import { User, Shield, ShoppingBag, Heart, Settings, Bell, CreditCard, ChevronRight, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
+  
+  // 1. Create a state to control which tab is active
+  const [activeTab, setActiveTab] = useState('profile')
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-brand-secondary mb-4">Please sign in</h1>
-          <p className="text-muted-foreground">You need to be signed in to view your profile.</p>
-        </div>
+      <div className="min-h-[70vh] flex items-center justify-center container mx-auto px-4">
+        <Card className="max-w-md w-full border-none shadow-2xl rounded-[2.5rem] p-8 text-center overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/10 blur-3xl rounded-full -mr-16 -mt-16" />
+          <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <User className="h-10 w-10 text-slate-400" />
+          </div>
+          <h1 className="text-3xl font-black text-slate-900 mb-2">Identify Yourself</h1>
+          <p className="text-slate-500 mb-8 font-medium">Please sign in to access your personal dashboard.</p>
+          <Button className="w-full h-12 bg-slate-900 text-white font-bold rounded-xl">Return to Login</Button>
+        </Card>
       </div>
     )
   }
 
+  // 2. Define Sidebar items with "value" matching the Tab values
+  const sidebarItems = [
+    { name: 'Account Info', value: 'profile', icon: User },
+    { name: 'My Orders', value: 'orders', icon: ShoppingBag },
+    { name: 'Wishlist', value: 'wishlist', icon: Heart },
+    { name: 'Preferences', value: 'preferences', icon: Settings },
+    { name: 'Security', value: 'security', icon: Shield },
+  ]
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand-secondary mb-2">My Profile</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences</p>
+    <div className="min-h-screen bg-slate-50/50 pb-20">
+      {/* Header Hero */}
+      <div className="bg-white border-b border-slate-100 pt-16 pb-12 mb-10">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+            <div className="relative w-24 h-24 bg-brand-accent/5 rounded-full flex items-center justify-center border-4 border-white shadow-xl">
+              <User className="h-12 w-12 text-brand-accent" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                Dashboard <span className="text-slate-300">/</span> {user.email?.split('@')[0]}
+              </h1>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <User className="h-10 w-10 text-brand-accent" />
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Sidebar - Now handles Tab Switching */}
+          <aside className="lg:col-span-3">
+            <nav className="bg-white rounded-[2rem] p-4 shadow-sm border border-slate-100 space-y-1">
+              {sidebarItems.map((item) => (
+                <Button 
+                  key={item.value}
+                  variant="ghost" 
+                  onClick={() => setActiveTab(item.value)} // Change tab on click
+                  className={cn(
+                    "w-full justify-between h-12 px-4 rounded-xl font-bold transition-all group",
+                    activeTab === item.value ? "bg-brand-accent/5 text-brand-accent" : "text-slate-500 hover:bg-slate-50"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon className={cn("h-4 w-4", activeTab === item.value ? "text-brand-accent" : "text-slate-400")} />
+                    {item.name}
                   </div>
-                  <h3 className="font-semibold text-brand-secondary">
-                    {user.email?.split('@')[0] || 'User'}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                </div>
+                  <ChevronRight className={cn("h-4 w-4 transition-opacity", activeTab === item.value ? "opacity-100" : "opacity-0")} />
+                </Button>
+              ))}
+              <Separator className="my-2 bg-slate-50" />
+              <Button 
+                onClick={() => signOut()}
+                variant="ghost" 
+                className="w-full justify-start gap-3 h-12 px-4 rounded-xl font-bold text-rose-500 hover:bg-rose-50"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </nav>
+          </aside>
 
-                <Separator />
+          {/* Main Content Area */}
+          <main className="lg:col-span-9">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              
+              {/* Profile Details Tab */}
+              <TabsContent value="profile" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2">
+                <Card className="border-none shadow-sm rounded-[2.5rem] overflow-hidden bg-white">
+                  <CardHeader className="p-8 border-b border-slate-50">
+                    <CardTitle className="text-xl font-black">Personal Information</CardTitle>
+                    <CardDescription>Manage your identity and contact details.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <ProfileForm />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                <nav className="space-y-2">
-                  <Link href="/profile">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                      <User className="h-4 w-4" />
-                      Profile
-                    </Button>
-                  </Link>
-                  <Link href="/orders">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                      <ShoppingBag className="h-4 w-4" />
-                      My Orders
-                    </Button>
-                  </Link>
-                  <Link href="/wishlist">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                      <Heart className="h-4 w-4" />
-                      Wishlist
-                    </Button>
-                  </Link>
-                  <Link href="/security">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                      <Shield className="h-4 w-4" />
-                      Security
-                    </Button>
-                  </Link>
-                </nav>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              {/* My Orders Tab - STAYS IN PROFILE PAGE */}
+              <TabsContent value="orders" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2">
+                <Card className="border-none shadow-sm rounded-[2.5rem] overflow-hidden bg-white">
+                  <CardHeader className="p-8 border-b border-slate-50">
+                    <CardTitle className="text-xl font-black">Purchase History</CardTitle>
+                    <CardDescription>Track your tech gear and view digital receipts.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <ProfileOrders /> {/* This component is now rendered inside the profile */}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-        {/* Main Content */}
-        <div className="lg:col-span-3">
-          <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="profile">Profile Information</TabsTrigger>
-              <TabsTrigger value="preferences">Preferences</TabsTrigger>
-            </TabsList>
+              <TabsContent value="wishlist" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2">
+                <Card className="border-none shadow-sm rounded-[2.5rem] overflow-hidden bg-white">
+                  <CardHeader className="p-8 border-b border-slate-50">
+                    <CardTitle className="text-xl font-black">My Wishlist</CardTitle>
+                    <CardDescription>Save your future tech picks and dream gear.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <ProfileWishlist /> {/* This component is now rendered inside the profile */}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+               {/* Preferences Tab */}
+              <TabsContent value="preferences" className="mt-0 outline-none animate-in fade-in slide-in-from-bottom-2">
+                <Card className="border-none shadow-sm rounded-[2.5rem] overflow-hidden bg-white">
+                  <CardHeader className="p-8 border-b border-slate-50">
+                    <CardTitle className="text-xl font-black">Global Settings</CardTitle>
+                    <CardDescription>Customize your notification and display experience.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8 space-y-8">
+                     <div className="flex items-center justify-between">
+                        <Label className="font-bold">Order Notifications</Label>
+                        <Switch defaultChecked />
+                     </div>
+                     <Separator />
+                     <Button className="bg-slate-900 rounded-xl">Save Preferences</Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="profile">
-              <ProfileForm />
-            </TabsContent>
-
-            <TabsContent value="preferences">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Preferences</CardTitle>
-                  <CardDescription>Manage your notification and display preferences</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Email Notifications</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Order updates</span>
-                        <Switch id="order-notifications" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Promotional emails</span>
-                        <Switch id="promotional-emails" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Newsletter</span>
-                        <Switch id="newsletter" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-2">
-                    <Label>Display Preferences</Label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Currency display</span>
-                        <select className="border rounded-md px-2 py-1 text-sm">
-                          <option>USD ($)</option>
-                          <option>EUR (€)</option>
-                          <option>GBP (£)</option>
-                        </select>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Theme</span>
-                        <select className="border rounded-md px-2 py-1 text-sm">
-                          <option>Light</option>
-                          <option>Dark</option>
-                          <option>System</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button className="bg-brand-accent hover:bg-brand-accent/90">
-                    Save Preferences
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+            </Tabs>
+          </main>
         </div>
       </div>
     </div>
   )
 }
-
-// Import missing components
-import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'

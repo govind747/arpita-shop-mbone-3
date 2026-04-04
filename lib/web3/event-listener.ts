@@ -1,4 +1,4 @@
-import { createPublicClient, http } from 'viem'
+import { createPublicClient, http, parseAbiItem } from 'viem'
 import { sepolia } from 'viem/chains'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
@@ -32,13 +32,13 @@ export async function startPaymentListener() {
   // Listen for past events (in case we missed any while offline)
   try {
     const currentBlock = await client.getBlockNumber()
-    const fromBlock = currentBlock - 10000n // Last 10000 blocks
+    const fromBlock = currentBlock - BigInt(10000) // Last 10000 blocks
 
     console.log(`🔍 Scanning from block ${fromBlock} to ${currentBlock}`)
 
     const pastLogs = await client.getLogs({
       address: CONTRACT_ADDRESS,
-      event: ABI[0],
+      event: parseAbiItem('event PaymentProcessed(bytes32 indexed orderHash, string invoiceId, address indexed buyer, uint256 amount)'),
       fromBlock,
       toBlock: currentBlock
     })
@@ -52,11 +52,10 @@ export async function startPaymentListener() {
     console.error('Error fetching past logs:', error)
   }
 
-  // Listen for new events
+  // Listen for new events - FIXED SYNTAX
   client.watchEvent({
     address: CONTRACT_ADDRESS,
-    abi: ABI,
-    eventName: 'PaymentProcessed',
+    event: parseAbiItem('event PaymentProcessed(bytes32 indexed orderHash, string invoiceId, address indexed buyer, uint256 amount)'),
     onLogs: async (logs) => {
       console.log(`📨 Received ${logs.length} new payment events`)
       for (const log of logs) {
@@ -81,14 +80,19 @@ async function processPaymentLog(log: any) {
 
   console.log('🔥 Payment detected:', {
     txHash,
-    orderHash: orderHash.toString(),
+    orderHash: orderHash?.toString(),
     invoiceId,
     buyer,
-    amount: amount.toString()
+    amount: amount?.toString()
   })
 
   // Convert bytes32 to string for comparison
-  const orderHashString = orderHash.toString()
+  const orderHashString = orderHash?.toString()
+
+  if (!orderHashString) {
+    console.error('No order hash found in event')
+    return
+  }
 
   try {
     // Update order status - only if still pending
@@ -118,7 +122,7 @@ async function processPaymentLog(log: any) {
           order_id: data[0].id,
           chain: 'sepolia',
           token_symbol: 'MBONE',
-          amount: amount.toString(),
+          amount: amount?.toString(),
           tx_hash: txHash,
           from_wallet: buyer,
           to_contract: CONTRACT_ADDRESS,

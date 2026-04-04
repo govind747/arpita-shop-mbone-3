@@ -77,11 +77,13 @@ export interface Setting {
 
 export interface Shipment {
   id: string
-  order_id: string
-  courier_name: string | null
+  orderId: string
+  status: string
   tracking_number: string | null
-  status: 'processing' | 'shipped' | 'in_transit' | 'delivered'
+  courier_name: string | null
+  estimated_delivery?: string | null  // Add this
   shipped_at: string | null
   delivered_at: string | null
   created_at: string
+  updated_at: string
 }

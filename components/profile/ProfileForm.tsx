@@ -6,12 +6,13 @@ import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { User, Mail, Phone, Calendar, Save, Loader2, Camera, LogOut } from 'lucide-react'
+import { User, Mail, Phone, Calendar, Save, Loader2, Camera, Lock, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 interface ProfileFormData {
   first_name: string
@@ -22,7 +23,7 @@ interface ProfileFormData {
 }
 
 export function ProfileForm() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -37,19 +38,15 @@ export function ProfileForm() {
   const [avatarPreview, setAvatarPreview] = useState<string>('')
 
   useEffect(() => {
-    if (user) {
-      fetchProfile()
-    }
+    if (user) fetchProfile()
   }, [user])
 
   const fetchProfile = async () => {
-    if (!user) return
-
     try {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', user?.id)
         .single()
 
       if (error) throw error
@@ -65,8 +62,7 @@ export function ProfileForm() {
         setAvatarPreview(data.avatar_url || '')
       }
     } catch (error) {
-      console.error('Error fetching profile:', error)
-      toast.error('Failed to load profile')
+      toast.error('Unable to fetch profile details')
     } finally {
       setLoading(false)
     }
@@ -77,7 +73,6 @@ export function ProfileForm() {
     setFormData(prev => ({
       ...prev,
       [name]: value,
-      // Auto-generate full_name from first and last name
       ...(name === 'first_name' || name === 'last_name' ? {
         full_name: `${name === 'first_name' ? value : formData.first_name} ${name === 'last_name' ? value : formData.last_name}`.trim()
       } : {})
@@ -87,257 +82,139 @@ export function ProfileForm() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      if (file.size > 2 * 1024 * 1024) return toast.error("File too large (Max 2MB)")
       setAvatarFile(file)
-      const preview = URL.createObjectURL(file)
-      setAvatarPreview(preview)
+      setAvatarPreview(URL.createObjectURL(file))
     }
-  }
-
-  const uploadAvatar = async (): Promise<string | null> => {
-    if (!avatarFile || !user) return null
-
-    const fileExt = avatarFile.name.split('.').pop()
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`
-    const filePath = `avatars/${fileName}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, avatarFile)
-
-    if (uploadError) {
-      console.error('Error uploading avatar:', uploadError)
-      return null
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath)
-
-    return publicUrl
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
-
     setSaving(true)
     try {
       let avatarUrl = formData.avatar_url
 
-      // Upload new avatar if selected
       if (avatarFile) {
-        const uploadedUrl = await uploadAvatar()
-        if (uploadedUrl) avatarUrl = uploadedUrl
+        const fileExt = avatarFile.name.split('.').pop()
+        const filePath = `avatars/${user?.id}-${Date.now()}.${fileExt}`
+        const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatarFile)
+        if (uploadError) throw uploadError
+        avatarUrl = supabase.storage.from('avatars').getPublicUrl(filePath).data.publicUrl
       }
 
-      // Update profile
       const { error } = await supabase
         .from('users')
-        .update({
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          full_name: formData.full_name,
-          phone: formData.phone,
-          avatar_url: avatarUrl,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
+        .update({ ...formData, avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+        .eq('id', user?.id)
 
       if (error) throw error
-
-      toast.success('Profile updated successfully!')
-      
-      // Refresh the page to show updated data
+      toast.success('Profile updated successfully')
       router.refresh()
     } catch (error) {
-      console.error('Error updating profile:', error)
-      toast.error('Failed to update profile')
+      toast.error('Failed to save changes')
     } finally {
       setSaving(false)
     }
   }
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    toast.success('Signed out successfully')
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-accent" />
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="h-64 flex flex-col items-center justify-center space-y-4">
+      <Loader2 className="h-10 w-10 animate-spin text-brand-accent" />
+      <p className="text-slate-400 font-bold animate-pulse">Synchronizing Profile...</p>
+    </div>
+  )
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Avatar Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Profile Picture</CardTitle>
-          <CardDescription>Upload a photo to personalize your account</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center space-y-4">
-          <div className="relative">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarPreview} />
-              <AvatarFallback className="bg-brand-accent text-white text-xl">
-                {formData.first_name?.[0] || formData.email?.[0] || user?.email?.[0] || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <label
-              htmlFor="avatar-upload"
-              className="absolute bottom-0 right-0 p-1 bg-brand-accent rounded-full cursor-pointer hover:bg-brand-accent/90 transition-colors"
-            >
-              <Camera className="h-4 w-4 text-white" />
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-            </label>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Click the camera icon to upload a profile picture
+    <form onSubmit={handleSubmit} className="space-y-10">
+      
+      {/* Avatar Integration Section */}
+      <div className="flex flex-col sm:flex-row items-center gap-8 bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100">
+        <div className="relative group">
+          <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-accent to-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-500" />
+          <Avatar className="h-32 w-32 border-4 border-white shadow-2xl relative">
+            <AvatarImage src={avatarPreview} className="object-cover" />
+            <AvatarFallback className="bg-slate-900 text-white text-3xl font-black">
+              {formData.first_name?.[0] || user?.email?.[0]?.toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <label htmlFor="avatar-upload" className="absolute bottom-1 right-1 h-10 w-10 bg-slate-900 rounded-full flex items-center justify-center cursor-pointer border-4 border-white hover:bg-brand-accent transition-all shadow-lg active:scale-90">
+            <Camera className="h-4 w-4 text-white" />
+            <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          </label>
+        </div>
+        <div className="text-center sm:text-left space-y-2">
+          <h3 className="text-xl font-black text-slate-900">Profile Photo</h3>
+          <p className="text-sm text-slate-500 font-medium max-w-[240px]">
+            JPG or PNG. Max size of 2MB. A clean photo helps identify your orders.
           </p>
-        </CardContent>
-      </Card>
+          {avatarFile && <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full">New Image Ready</span>}
+        </div>
+      </div>
 
-      {/* Personal Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Personal Information</CardTitle>
-          <CardDescription>Update your personal details</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first_name">First Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  placeholder="Enter your first name"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  placeholder="Enter your last name"
-                />
-              </div>
-            </div>
+      {/* Inputs Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="space-y-2">
+          <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">First Name</Label>
+          <div className="relative group">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-accent transition-colors" />
+            <Input name="first_name" value={formData.first_name} onChange={handleInputChange} className="h-12 pl-12 bg-white border-slate-100 rounded-xl focus:ring-brand-accent/10" placeholder="John" />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="full_name">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="full_name"
-                name="full_name"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                className="pl-10 bg-muted/30"
-                placeholder="Auto-generated from first and last name"
-                disabled
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Full name is automatically generated from first and last name
-            </p>
+        <div className="space-y-2">
+          <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</Label>
+          <div className="relative group">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-accent transition-colors" />
+            <Input name="last_name" value={formData.last_name} onChange={handleInputChange} className="h-12 pl-12 bg-white border-slate-100 rounded-xl focus:ring-brand-accent/10" placeholder="Doe" />
           </div>
+        </div>
 
-          <Separator />
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                value={user?.email || ''}
-                className="pl-10 bg-muted/30"
-                disabled
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Email cannot be changed. Contact support if you need to update it.
-            </p>
+        <div className="md:col-span-2 space-y-2">
+          <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Full Name Display</Label>
+          <div className="relative">
+            <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+            <Input value={formData.full_name} disabled className="h-12 pl-12 bg-slate-50 border-none rounded-xl text-slate-500 font-bold" />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="pl-10"
-                placeholder="Enter your phone number"
-              />
-            </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</Label>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+            <Input value={user?.email || ''} disabled className="h-12 pl-12 bg-slate-50 border-none rounded-xl text-slate-300 font-medium italic" />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label>Account Created</Label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={user?.created_at ? new Date(user.created_at).toLocaleDateString() : ''}
-                className="pl-10 bg-muted/30"
-                disabled
-              />
-            </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Mobile Contact</Label>
+          <div className="relative group">
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-brand-accent transition-colors" />
+            <Input name="phone" value={formData.phone} onChange={handleInputChange} className="h-12 pl-12 bg-white border-slate-100 rounded-xl focus:ring-brand-accent/10" placeholder="+1 (555) 000-0000" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4">
-        <Button
-          type="submit"
-          disabled={saving}
-          className="bg-brand-accent hover:bg-brand-accent/90 flex-1"
+      <Separator className="bg-slate-100" />
+
+      {/* Form Action */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="hidden sm:flex items-center gap-2 text-slate-400">
+          <Calendar className="h-4 w-4" />
+          <span className="text-xs font-bold uppercase tracking-tighter">Joined {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'recently'}</span>
+        </div>
+        <Button 
+          type="submit" 
+          disabled={saving} 
+          className="h-12 px-10 bg-slate-900 hover:bg-brand-accent text-white font-bold rounded-xl transition-all shadow-xl shadow-slate-900/10 active:scale-95"
         >
           {saving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
-            </>
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
+            <div className="flex items-center gap-2">
+              <Save className="h-4 w-4" />
               Save Changes
-            </>
+            </div>
           )}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleSignOut}
-          className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
         </Button>
       </div>
     </form>

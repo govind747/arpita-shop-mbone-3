@@ -1,260 +1,177 @@
-import { FileText, Scale, Shield, AlertTriangle } from 'lucide-react'
+import { FileText, Scale, Shield, AlertTriangle, CheckCircle2, Info, Gavel, Globe } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 export default function TermsPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Header */}
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-brand-secondary mb-6">
-          Terms of Service
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Please read these terms carefully before using our website and services.
-        </p>
-        <p className="text-sm text-muted-foreground mt-4">
-          Last updated: January 30, 2024
-        </p>
-      </div>
-
-      {/* Terms Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-6 w-6 text-brand-accent" />
+    <div className="min-h-screen bg-slate-50/50 py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        
+        {/* Header Section */}
+        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-1000">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-600">
+              <Scale className="h-10 w-10" />
             </div>
-            <h3 className="font-semibold mb-2">Clear Terms</h3>
-            <p className="text-sm text-muted-foreground">
-              Straightforward terms that are easy to understand
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            Terms of <span className="text-blue-600">Service</span>
+          </h1>
+          <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            These terms govern your use of ModernMart. We’ve tried to keep them 
+            as fair and transparent as possible.
+          </p>
+          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 text-sm font-medium text-slate-500 shadow-sm">
+            <Info className="h-4 w-4 text-blue-500" /> Effective Date: April 2, 2026
+          </div>
+        </div>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Scale className="h-6 w-6 text-brand-accent" />
+        {/* Quick Summary Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          {[
+            { icon: <FileText />, title: "Clear Terms", desc: "No hidden small print or confusing jargon." },
+            { icon: <Scale />, title: "Fair Usage", desc: "Balanced rights for you and the platform." },
+            { icon: <Shield />, title: "Secure Data", desc: "Your info is handled with extreme care." },
+            { icon: <AlertTriangle />, title: "User Duty", desc: "Basic rules for a safe community." },
+          ].map((item, i) => (
+            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-blue-600 mb-4">{item.icon}</div>
+              <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
             </div>
-            <h3 className="font-semibold mb-2">Fair Usage</h3>
-            <p className="text-sm text-muted-foreground">
-              Reasonable terms that protect both you and us
-            </p>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="h-6 w-6 text-brand-accent" />
-            </div>
-            <h3 className="font-semibold mb-2">Your Rights</h3>
-            <p className="text-sm text-muted-foreground">
-              Clear explanation of your rights as a customer
-            </p>
-          </CardContent>
-        </Card>
+        {/* Main Content */}
+        <div className="space-y-10">
+          
+          {/* Acceptance Card - High Visibility */}
+          <Card className="border-none shadow-xl shadow-blue-900/5 bg-blue-600 text-white overflow-hidden rounded-[2rem]">
+            <CardContent className="p-10 flex flex-col md:flex-row items-center gap-8">
+              <div className="bg-white/10 p-4 rounded-2xl">
+                <CheckCircle2 className="h-12 w-12 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Acceptance of Agreement</h2>
+                <p className="text-blue-100 leading-relaxed">
+                  By using ModernMart, you agree to these terms. If you're under 18, 
+                  you must have a parent or guardian's permission to use the site.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="h-6 w-6 text-brand-accent" />
-            </div>
-            <h3 className="font-semibold mb-2">Responsibilities</h3>
-            <p className="text-sm text-muted-foreground">
-              What we expect from users of our platform
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Detailed Sections */}
+          <div className="grid gap-10">
+            
+            {/* Section: Account */}
+            <section className="group relative pl-0 md:pl-8">
+              <div className="hidden md:block absolute left-0 top-0 h-full w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors rounded-full" />
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <h3 className="text-3xl font-bold text-slate-900">User Accounts</h3>
+                <Badge variant="outline" className="w-fit bg-white text-slate-500 border-slate-200">
+                  TL;DR: Keep your login safe.
+                </Badge>
+              </div>
+              <Card className="border-none shadow-sm rounded-2xl">
+                <CardContent className="p-8 space-y-6">
+                  <p className="text-slate-600 leading-relaxed">
+                    You are responsible for all activity that happens on your account. 
+                    You must provide accurate info and notify us immediately of any breaches.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-500" /> One account per person
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-500" /> 18+ years of age required
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
 
-      {/* Terms Content */}
-      <div className="max-w-4xl mx-auto space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Acceptance of Terms</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              By accessing and using ModernMart's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
-            </p>
-          </CardContent>
-        </Card>
+            {/* Section: Crypto & Payments */}
+            <section className="group relative pl-0 md:pl-8">
+              <div className="hidden md:block absolute left-0 top-0 h-full w-1 bg-slate-200 group-hover:bg-emerald-500 transition-colors rounded-full" />
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <h3 className="text-3xl font-bold text-slate-900">Payments & MBONE</h3>
+                <Badge variant="outline" className="w-fit bg-emerald-50 text-emerald-700 border-emerald-100">
+                  TL;DR: Crypto is final once confirmed.
+                </Badge>
+              </div>
+              <Card className="border-none shadow-sm rounded-2xl bg-slate-900 text-white">
+                <CardContent className="p-8 space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400">
+                      <Globe className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-4">
+                      <p className="text-slate-300 leading-relaxed">
+                        MBONE token payments are processed via the Polygon network. 
+                        Once a transaction is confirmed on the blockchain, it is final.
+                      </p>
+                      <ul className="space-y-2 text-sm text-slate-400">
+                        <li>• Users are responsible for gas fees (Network fees)</li>
+                        <li>• Refunds are calculated based on the USD value at checkout</li>
+                        <li>• We are not liable for wallet-side security failures</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Use License</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Permission is granted to temporarily download one copy of the materials on ModernMart's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
-            </p>
-            <ul className="text-muted-foreground space-y-1 ml-4">
-              <li>• Modify or copy the materials</li>
-              <li>• Use the materials for any commercial purpose or for any public display</li>
-              <li>• Attempt to reverse engineer any software contained on the website</li>
-              <li>• Remove any copyright or other proprietary notations from the materials</li>
-            </ul>
-            <p className="text-muted-foreground">
-              This license shall automatically terminate if you violate any of these restrictions and may be terminated by ModernMart at any time.
-            </p>
-          </CardContent>
-        </Card>
+            {/* Section: Liability */}
+            <section className="group relative pl-0 md:pl-8">
+              <div className="hidden md:block absolute left-0 top-0 h-full w-1 bg-slate-200 group-hover:bg-amber-500 transition-colors rounded-full" />
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <h3 className="text-3xl font-bold text-slate-900">Limitations</h3>
+                <Badge variant="outline" className="w-fit bg-amber-50 text-amber-700 border-amber-100">
+                  TL;DR: We aren't liable for system outages.
+                </Badge>
+              </div>
+              <Card className="border-none shadow-sm rounded-2xl">
+                <CardContent className="p-8">
+                  <p className="text-slate-600 leading-relaxed italic border-l-4 border-slate-100 pl-6">
+                    "ModernMart provides services 'as is'. We do not guarantee 100% 
+                    uptime or that the site will always be error-free. Our liability 
+                    is limited to the maximum extent permitted by law."
+                  </p>
+                </CardContent>
+              </Card>
+            </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Terms</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Account Creation</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• You must provide accurate and complete information</li>
-                <li>• You are responsible for maintaining account security</li>
-                <li>• You must be at least 18 years old to create an account</li>
-                <li>• One account per person is allowed</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Account Responsibilities</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Keep your login credentials secure</li>
-                <li>• Notify us immediately of any unauthorized access</li>
-                <li>• You are responsible for all activities under your account</li>
-                <li>• Update your information when it changes</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders and Payments</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Order Processing</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• All orders are subject to acceptance and availability</li>
-                <li>• We reserve the right to refuse or cancel any order</li>
-                <li>• Prices are subject to change without notice</li>
-                <li>• Orders are processed within 1-2 business days</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2">Crypto Payments</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• MBONE token payments are processed on Polygon network</li>
-                <li>• You are responsible for transaction fees</li>
-                <li>• Payments are final once confirmed on blockchain</li>
-                <li>• Refunds for crypto payments are processed in USD equivalent</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              We strive to provide accurate product information, but we do not warrant that product descriptions, pricing, or other content is accurate, complete, reliable, current, or error-free.
-            </p>
-            <ul className="text-muted-foreground space-y-1 ml-4">
-              <li>• Product images may not reflect exact appearance</li>
-              <li>• Specifications are subject to manufacturer changes</li>
-              <li>• Availability is not guaranteed until order confirmation</li>
-              <li>• We reserve the right to correct errors in pricing or descriptions</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Shipping and Returns</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Shipping</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• Shipping times are estimates and not guaranteed</li>
-                <li>• Risk of loss passes to you upon delivery</li>
-                <li>• We are not responsible for shipping delays beyond our control</li>
-                <li>• Additional fees may apply for remote locations</li>
-              </ul>
+            {/* Governing Law & Contact */}
+            <div className="pt-10 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-12">
+               <div>
+                 <h4 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                   <Gavel className="h-5 w-5 text-blue-600" /> Governing Law
+                 </h4>
+                 <p className="text-slate-500 text-sm leading-relaxed">
+                   These terms are governed by the laws of the United States. 
+                   Any disputes will be handled in the exclusive jurisdiction of 
+                   our local courts.
+                 </p>
+               </div>
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                 <h4 className="font-bold text-slate-900 mb-4">Legal Inquiries</h4>
+                 <div className="space-y-2 text-sm">
+                   <p className="flex justify-between">
+                     <span className="text-slate-400">Email:</span>
+                     <span className="font-medium text-blue-600">legal@modernmart.com</span>
+                   </p>
+                   <p className="flex justify-between">
+                     <span className="text-slate-400">Response Time:</span>
+                     <span className="font-medium">3-5 Business Days</span>
+                   </p>
+                 </div>
+               </div>
             </div>
 
-            <div>
-              <h3 className="font-semibold mb-2">Returns</h3>
-              <ul className="text-muted-foreground space-y-1 ml-4">
-                <li>• 30-day return policy for most items</li>
-                <li>• Items must be in original condition</li>
-                <li>• Return shipping costs may apply</li>
-                <li>• Some items are non-returnable</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Limitation of Liability</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              In no event shall ModernMart or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on ModernMart's website, even if ModernMart or a ModernMart authorized representative has been notified orally or in writing of the possibility of such damage.
-            </p>
-            <p className="text-muted-foreground">
-              Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Governing Law</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              These terms and conditions are governed by and construed in accordance with the laws of the United States and you irrevocably submit to the exclusive jurisdiction of the courts in that state or location.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Changes to Terms</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              ModernMart reserves the right to revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.
-            </p>
-            <p className="text-muted-foreground">
-              We will notify users of significant changes via email or website notification.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              If you have any questions about these Terms of Service, please contact us:
-            </p>
-            <div className="space-y-2 text-muted-foreground">
-              <p><strong>Email:</strong> legal@modernmart.com</p>
-              <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-              <p><strong>Address:</strong> 123 Tech Street, Digital City, DC 12345</p>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
-
